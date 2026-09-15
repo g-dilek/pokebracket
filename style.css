@@ -1,0 +1,509 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+
+  color: #202124;
+  background: #f6f7fb;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+
+  background: radial-gradient(
+    circle at top,
+    #ffffff 0%,
+    #f6f7fb 55%,
+    #eef0f6 100%
+  );
+}
+
+button {
+  font: inherit;
+}
+
+.app {
+  width: 100%;
+  max-width: 1100px;
+
+  min-height: 100vh;
+
+  padding: 48px 32px 32px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+
+.header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.pokeball-icon {
+  width: 48px;
+  height: 48px;
+
+  margin: 0 auto 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  border: 2px solid #202124;
+
+  font-size: 30px;
+  line-height: 1;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+h1 {
+  margin: 0;
+
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.subtitle {
+  margin: 10px 0 28px;
+
+  color: #6b7280;
+
+  font-size: 1.05rem;
+}
+
+/* =========================
+   PROGRESS
+   ========================= */
+
+.progress-container {
+  width: 100%;
+  max-width: 650px;
+
+  margin: 0 auto;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background: #e2e5eb;
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+
+  border-radius: inherit;
+
+  background: #4f46e5;
+
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+
+  margin-top: 8px;
+
+  color: #737780;
+
+  font-size: 0.85rem;
+}
+
+/* =========================
+   MATCHUP
+   ========================= */
+
+.matchup {
+  flex: 1;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto
+    minmax(0, 1fr);
+
+  align-items: center;
+
+  gap: 28px;
+
+  width: 100%;
+  max-width: 950px;
+
+  margin: 0 auto;
+}
+
+/* =========================
+   POKÉMON CARDS
+   ========================= */
+
+.pokemon-card {
+  width: 100%;
+
+  min-height: 390px;
+
+  padding: 28px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid transparent;
+  border-radius: 28px;
+
+  background: #ffffff;
+
+  cursor: pointer;
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+
+  transition: transform 0.18s ease, box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.pokemon-card:hover {
+  transform: translateY(-6px);
+
+  border-color: #d9dcff;
+
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.11);
+}
+
+.pokemon-card:active {
+  transform: translateY(-2px) scale(0.99);
+}
+
+.pokemon-card:focus-visible {
+  outline: 4px solid rgba(79, 70, 229, 0.25);
+  outline-offset: 4px;
+}
+
+.pokemon-image-container {
+  width: 100%;
+  height: 280px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+}
+
+.pokemon-image {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  image-rendering: auto;
+
+  opacity: 0;
+
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.pokemon-image.loaded {
+  opacity: 1;
+}
+
+.pokemon-card:hover .pokemon-image.loaded {
+  transform: scale(1.06);
+}
+
+.loading {
+  position: absolute;
+
+  color: #9ca3af;
+
+  font-size: 0.9rem;
+}
+
+.pokemon-name {
+  margin-top: 18px;
+
+  font-size: clamp(1.4rem, 3vw, 2rem);
+
+  font-weight: 750;
+
+  text-align: center;
+
+  letter-spacing: -0.025em;
+}
+
+/* =========================
+   VS
+   ========================= */
+
+.vs {
+  width: 64px;
+  height: 64px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #202124;
+  color: #ffffff;
+
+  font-size: 0.9rem;
+  font-weight: 800;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+
+  flex-shrink: 0;
+}
+
+/* =========================
+   ACTIONS
+   ========================= */
+
+.actions {
+  display: flex;
+  justify-content: center;
+
+  margin-top: 28px;
+}
+
+.secondary-button {
+  padding: 12px 20px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  border: 1px solid #d9dce3;
+  border-radius: 999px;
+
+  background: #ffffff;
+  color: #555b66;
+
+  cursor: pointer;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  transition: background 0.15s ease, border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.secondary-button:hover {
+  background: #f9fafb;
+
+  border-color: #c6c9d2;
+
+  transform: translateY(-1px);
+}
+
+.secondary-button:active {
+  transform: translateY(0);
+}
+
+/* =========================
+   STATUS
+   ========================= */
+
+.status {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+
+  margin-top: 26px;
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 3px;
+}
+
+.status-label {
+  color: #8a8f99;
+
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.status-value {
+  font-size: 1.1rem;
+  font-weight: 750;
+}
+
+/* =========================
+   FOOTER
+   ========================= */
+
+.footer {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+
+  margin-top: 28px;
+}
+
+.text-button {
+  padding: 6px 8px;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #737780;
+
+  cursor: pointer;
+
+  font-size: 0.85rem;
+
+  transition: color 0.15s ease;
+}
+
+.text-button:hover {
+  color: #202124;
+}
+
+.text-button.danger:hover {
+  color: #c24141;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 700px) {
+  .app {
+    padding: 28px 16px 24px;
+  }
+
+  .header {
+    margin-bottom: 20px;
+  }
+
+  .pokeball-icon {
+    width: 40px;
+    height: 40px;
+
+    font-size: 24px;
+
+    margin-bottom: 12px;
+  }
+
+  .subtitle {
+    margin-bottom: 20px;
+  }
+
+  .matchup {
+    grid-template-columns: 1fr;
+
+    gap: 12px;
+  }
+
+  .pokemon-card {
+    min-height: 240px;
+
+    padding: 18px;
+
+    border-radius: 22px;
+  }
+
+  .pokemon-image-container {
+    height: 175px;
+  }
+
+  .pokemon-name {
+    margin-top: 8px;
+  }
+
+  .vs {
+    width: 42px;
+    height: 42px;
+
+    margin: 0 auto;
+
+    font-size: 0.7rem;
+  }
+
+  .actions {
+    margin-top: 20px;
+  }
+
+  .status {
+    margin-top: 20px;
+  }
+
+  .footer {
+    margin-top: 20px;
+  }
+}
+
+/* =========================
+   LOADING / DISABLED STATES
+   ========================= */
+
+.pokemon-card.loading-card {
+  cursor: wait;
+}
+
+.pokemon-card.disabled {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* =========================
+   CHOICE ANIMATION
+   ========================= */
+
+.pokemon-card.chosen {
+  border-color: #4f46e5;
+
+  transform: scale(1.02);
+
+  box-shadow: 0 16px 45px rgba(79, 70, 229, 0.18);
+}
+
+.pokemon-card.lost {
+  opacity: 0.35;
+
+  transform: scale(0.97);
+}
+
+/* =========================
+   ERROR STATE
+   ========================= */
+
+.error {
+  color: #b42318;
+
+  font-size: 0.9rem;
+
+  text-align: center;
+}

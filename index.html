@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Pokémon Favorites</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <main class="app">
+      <!-- =========================================
+           Header
+           ========================================= -->
+
+      <header class="header">
+        <div class="pokeball-icon">◓</div>
+
+        <h1>Who do you love more?</h1>
+
+        <p class="subtitle">Pick your favorite Pokémon.</p>
+
+        <div class="progress-container">
+          <div class="progress-bar-container">
+            <div id="progress-bar" class="progress-bar"></div>
+          </div>
+
+          <div class="progress-text">
+            <span id="progress-text">0% complete</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- =========================================
+           Matchup
+           ========================================= -->
+
+      <section class="battle-area matchup" aria-label="Pokémon matchup">
+        <!-- Pokémon A -->
+
+        <button
+          id="pokemon-a"
+          class="pokemon-card"
+          type="button"
+          aria-label="Choose the first Pokémon"
+        >
+          <div class="pokemon-image-container">
+            <div class="loading">Loading...</div>
+
+            <img id="image-a" class="pokemon-image" alt="" />
+          </div>
+
+          <div class="pokemon-name" id="name-a">—</div>
+        </button>
+
+        <!-- VS -->
+
+        <div class="vs">
+          <span>VS</span>
+        </div>
+
+        <!-- Pokémon B -->
+
+        <button
+          id="pokemon-b"
+          class="pokemon-card"
+          type="button"
+          aria-label="Choose the second Pokémon"
+        >
+          <div class="pokemon-image-container">
+            <div class="loading">Loading...</div>
+
+            <img id="image-b" class="pokemon-image" alt="" />
+          </div>
+
+          <div class="pokemon-name" id="name-b">—</div>
+        </button>
+      </section>
+
+      <!-- =========================================
+           Matchup information
+           ========================================= -->
+
+      <div class="matchup-info">
+        <span id="matchup-number">Matchup</span>
+      </div>
+
+      <!-- =========================================
+           Actions
+           ========================================= -->
+
+      <section class="actions">
+        <button id="defer-button" class="secondary-button" type="button">
+          <span>🤔</span>
+          Too close to call
+        </button>
+      </section>
+
+      <!-- =========================================
+           Status
+           ========================================= -->
+
+      <section class="status">
+        <div class="status-item">
+          <span class="status-label">Remaining</span>
+
+          <span id="remaining-count" class="status-value"> 0 </span>
+        </div>
+
+        <div class="status-item">
+          <span class="status-label">Deferred</span>
+
+          <span id="deferred-count" class="status-value"> 0 </span>
+        </div>
+
+        <div class="status-item">
+          <span class="status-label">Deferred total</span>
+
+          <span id="deferred-pill" class="status-value"> 0 </span>
+        </div>
+      </section>
+
+      <!-- =========================================
+           Footer
+           ========================================= -->
+
+      <footer class="footer">
+        <button id="save-button" class="text-button" type="button">
+          Save progress
+        </button>
+
+        <button id="reset-button" class="text-button danger" type="button">
+          Reset tournament
+        </button>
+      </footer>
+    </main>
+
+    <!--
+      IMPORTANT:
+      pokelist.js must load BEFORE app.js because
+      app.js uses the global POKEMON array.
+    -->
+
+    <script src="pokelist.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
