@@ -12,6 +12,7 @@
 
 // PokéAPI endpoint
 const API_URL = "https://pokeapi.co/api/v2/pokemon/";
+console.log("POKEBRACKET APP.JS LOADED — VERSION 3");
 
 // =========================================
 // State
@@ -115,29 +116,48 @@ function getPokemon(id) {
 const artworkCache = new Map();
 
 async function getPokemonArtwork(pokemon) {
-  // Return cached artwork if we've already
-  // looked this Pokémon up.
   if (artworkCache.has(pokemon.apiName)) {
     return artworkCache.get(pokemon.apiName);
   }
 
   try {
-    const response = await fetch(API_URL + pokemon.apiName);
+    const url = API_URL + encodeURIComponent(pokemon.apiName);
+
+    console.log("Fetching Pokémon:", pokemon.displayName);
+    console.log("API URL:", url);
+
+    const response = await fetch(url);
+
+    console.log("API response:", response.status, response.statusText);
 
     if (!response.ok) {
-      throw new Error(`PokéAPI could not find "${pokemon.apiName}"`);
+      throw new Error(
+        `PokéAPI returned ${response.status} for "${pokemon.apiName}"`
+      );
     }
 
     const data = await response.json();
 
-    const artwork = data.sprites.other["official-artwork"].front_default;
+    console.log("PokéAPI data:", data);
 
-    // Cache the result so we don't request it again.
+    const artwork = data.sprites?.other?.["official-artwork"]?.front_default;
+
+    console.log("Artwork URL:", artwork);
+
+    if (!artwork) {
+      throw new Error(`No official artwork found for "${pokemon.apiName}"`);
+    }
+
     artworkCache.set(pokemon.apiName, artwork);
 
     return artwork;
   } catch (error) {
-    console.error("Could not load artwork:", pokemon.displayName, error);
+    console.error("========== POKÉAPI ERROR ==========");
+    console.error("Pokémon:", pokemon.displayName);
+    console.error("apiName:", pokemon.apiName);
+    console.error("URL:", API_URL + encodeURIComponent(pokemon.apiName));
+    console.error("Error:", error);
+    console.error("===================================");
 
     return "";
   }
@@ -150,26 +170,31 @@ async function displayPokemon(pokemon, imageElement, nameElement) {
   imageElement.src = "";
   imageElement.classList.remove("loaded");
 
-  // Find the loading indicator inside this Pokémon card.
   const container = imageElement.closest(".pokemon-image-container");
   const loadingElement = container.querySelector(".loading");
 
   loadingElement.style.display = "block";
+  loadingElement.textContent = "Loading...";
 
   const artwork = await getPokemonArtwork(pokemon);
 
+  console.log("FINAL ARTWORK FOR", pokemon.displayName, ":", artwork);
+
   if (!artwork) {
-    loadingElement.textContent = "Image unavailable";
+    console.error("No artwork URL returned for", pokemon.displayName);
+    loadingElement.textContent = "API error";
     return;
   }
 
   imageElement.onload = () => {
+    console.log("IMAGE LOADED:", pokemon.displayName);
     imageElement.classList.add("loaded");
     loadingElement.style.display = "none";
   };
 
-  imageElement.onerror = () => {
-    loadingElement.textContent = "Image unavailable";
+  imageElement.onerror = (error) => {
+    console.error("IMAGE FAILED TO LOAD:", pokemon.displayName, artwork, error);
+    loadingElement.textContent = "Image failed";
   };
 
   imageElement.src = artwork;
