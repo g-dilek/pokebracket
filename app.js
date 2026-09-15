@@ -24,6 +24,14 @@ let wins = {};
 let losses = {};
 let results = {};
 
+let tournamentSeed = null;
+
+// Prevents accidental double-clicks while moving to the next matchup.
+let isProcessingChoice = false;
+
+// Increment this if fundamental change is made to pokelist.js
+const POKEMON_LIST_VERSION = 1;
+
 // =========================================
 // DOM
 // =========================================
@@ -46,7 +54,11 @@ const deferredCount = document.getElementById("deferred-count");
 const deferredPill = document.getElementById("deferred-pill");
 
 const deferButton = document.getElementById("defer-button");
-const saveButton = document.getElementById("save-button");
+const saveGameButton = document.getElementById("save-game-button");
+
+const loadGameButton = document.getElementById("load-game-button");
+
+const loadGameInput = document.getElementById("load-game-input");
 const resetButton = document.getElementById("reset-button");
 
 // =========================================
@@ -57,20 +69,46 @@ function matchupKey(a, b) {
   return [a.id, b.id].sort().join("|||");
 }
 
-function shuffle(array) {
-  return array.sort(() => Math.random() - 0.5);
+function seededRandom(seed) {
+  return function () {
+    seed |= 0;
+    seed = (seed + 0x6d2b79f5) | 0;
+
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
-function createMatchups() {
+function shuffle(array, seed) {
+  const random = seededRandom(seed);
+
+  // Fisher-Yates shuffle.
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+
+  return array;
+}
+
+function createMatchups(seed) {
   const pairs = [];
 
   for (let i = 0; i < POKEMON.length; i++) {
     for (let j = i + 1; j < POKEMON.length; j++) {
-      pairs.push([POKEMON[i], POKEMON[j]]);
+      pairs.push([POKEMON[i].id, POKEMON[j].id]);
     }
   }
 
-  return shuffle(pairs);
+  return shuffle(pairs, seed);
+}
+
+function getPokemon(id) {
+  return POKEMON.find((pokemon) => pokemon.id === id);
 }
 
 // =========================================
@@ -115,14 +153,26 @@ async function displayPokemon(pokemon, imageElement, nameElement) {
   imageElement.src = "";
   imageElement.classList.remove("loaded");
 
+  // Find the loading indicator inside this Pokémon card.
+  const container = imageElement.closest(".pokemon-image-container");
+  const loadingElement = container.querySelector(".loading");
+
+  loadingElement.style.display = "block";
+
   const artwork = await getPokemonArtwork(pokemon);
 
   if (!artwork) {
+    loadingElement.textContent = "Image unavailable";
     return;
   }
 
   imageElement.onload = () => {
     imageElement.classList.add("loaded");
+    loadingElement.style.display = "none";
+  };
+
+  imageElement.onerror = () => {
+    loadingElement.textContent = "Image unavailable";
   };
 
   imageElement.src = artwork;
@@ -133,7 +183,11 @@ async function displayPokemon(pokemon, imageElement, nameElement) {
 // =========================================
 
 function createTournament() {
-  matchups = createMatchups();
+  isProcessingChoice = false;
+  // Generate a random seed for this tournament.
+  tournamentSeed = crypto.getRandomValues(new Uint32Array(1))[0];
+
+  matchups = createMatchups(tournamentSeed);
 
   currentIndex = 0;
   deferred = [];
@@ -147,6 +201,9 @@ function createTournament() {
     losses[pokemon.id] = 0;
   }
 
+  deferButton.textContent = "Too close to call";
+  deferButton.disabled = false;
+
   showCurrentMatchup();
 }
 
@@ -154,7 +211,12 @@ async function showCurrentMatchup() {
   // Skip any already-resolved matchups.
   while (
     currentIndex < matchups.length &&
-    results[matchupKey(...matchups[currentIndex])]
+    results[
+      matchupKey(
+        getPokemon(matchups[currentIndex][0]),
+        getPokemon(matchups[currentIndex][1])
+      )
+    ]
   ) {
     currentIndex++;
   }
@@ -165,13 +227,25 @@ async function showCurrentMatchup() {
     return;
   }
 
-  const [a, b] = matchups[currentIndex];
+  const [idA, idB] = matchups[currentIndex];
+
+  const a = getPokemon(idA);
+  const b = getPokemon(idB);
+
+  if (!a || !b) {
+    console.error("Could not find Pokémon:", idA, idB);
+
+    return;
+  }
 
   matchupNumber.textContent = `Matchup ${currentIndex + 1} / ${
     matchups.length
   }`;
 
   updateProgress();
+
+  deferButton.textContent = "Too close to call";
+  deferButton.disabled = false;
 
   await Promise.all([
     displayPokemon(a, imageA, nameA),
@@ -184,7 +258,23 @@ async function showCurrentMatchup() {
 // =========================================
 
 function choosePokemon(winner) {
-  const [a, b] = matchups[currentIndex];
+  if (isProcessingChoice) {
+    return;
+  }
+
+  isProcessingChoice = true;
+
+  const [idA, idB] = matchups[currentIndex];
+
+  const a = getPokemon(idA);
+  const b = getPokemon(idB);
+
+  if (!a || !b) {
+    console.error("Could not find matchup Pokémon:", idA, idB);
+
+    isProcessingChoice = false;
+    return;
+  }
 
   const loser = winner.id === a.id ? b : a;
 
@@ -202,7 +292,9 @@ function choosePokemon(winner) {
 
   saveProgress();
 
-  showCurrentMatchup();
+  showCurrentMatchup().finally(() => {
+    isProcessingChoice = false;
+  });
 }
 
 // =========================================
@@ -210,7 +302,23 @@ function choosePokemon(winner) {
 // =========================================
 
 function deferMatchup() {
-  const [a, b] = matchups[currentIndex];
+  if (isProcessingChoice) {
+    return;
+  }
+
+  isProcessingChoice = true;
+
+  const [idA, idB] = matchups[currentIndex];
+
+  const a = getPokemon(idA);
+  const b = getPokemon(idB);
+
+  if (!a || !b) {
+    console.error("Could not find matchup Pokémon:", idA, idB);
+
+    isProcessingChoice = false;
+    return;
+  }
 
   const key = matchupKey(a, b);
 
@@ -222,14 +330,16 @@ function deferMatchup() {
 
   saveProgress();
 
-  showCurrentMatchup();
+  showCurrentMatchup().finally(() => {
+    isProcessingChoice = false;
+  });
 }
 
 // =========================================
 // Deferred matchups
 // =========================================
 
-function resolveDeferred() {
+async function resolveDeferred() {
   if (deferred.length === 0) {
     showResults();
     return;
@@ -245,9 +355,8 @@ function resolveDeferred() {
 
   const [idA, idB] = key.split("|||");
 
-  const a = POKEMON.find((pokemon) => pokemon.id === idA);
-
-  const b = POKEMON.find((pokemon) => pokemon.id === idB);
+  const a = getPokemon(idA);
+  const b = getPokemon(idB);
 
   if (!a || !b) {
     console.error("Could not find deferred Pokémon:", idA, idB);
@@ -256,21 +365,21 @@ function resolveDeferred() {
     return;
   }
 
-  // Display deferred matchup.
-  displayPokemon(a, imageA, nameA);
-  displayPokemon(b, imageB, nameB);
+  await Promise.all([
+    displayPokemon(a, imageA, nameA),
+    displayPokemon(b, imageB, nameB),
+  ]);
 
   matchupNumber.textContent = "Deferred matchup";
 
   updateProgress();
 
-  // Find the original matchup so the
-  // existing choosePokemon() logic can
-  // resolve it.
-  currentIndex = matchups.findIndex((pair) => matchupKey(...pair) === key);
+  // Find the original matchup.
+  currentIndex = matchups.findIndex(
+    ([matchupA, matchupB]) =>
+      matchupKey(getPokemon(matchupA), getPokemon(matchupB)) === key
+  );
 
-  // If this is the last deferred matchup,
-  // a decision is mandatory.
   const remaining = deferred.filter((key) => !results[key]);
 
   if (remaining.length === 1) {
@@ -353,21 +462,124 @@ function showResults() {
   `;
 }
 
+function rebuildStats() {
+  wins = {};
+  losses = {};
+
+  for (const pokemon of POKEMON) {
+    wins[pokemon.id] = 0;
+    losses[pokemon.id] = 0;
+  }
+
+  for (const result of Object.values(results)) {
+    if (
+      wins[result.winner] === undefined ||
+      losses[result.loser] === undefined
+    ) {
+      continue;
+    }
+
+    wins[result.winner]++;
+    losses[result.loser]++;
+  }
+}
+
 // =========================================
 // Save / Load
 // =========================================
 
-function saveProgress() {
-  const data = {
-    matchups,
-    currentIndex,
+function getSaveData() {
+  return {
+    version: 2,
+    pokemonListVersion: POKEMON_LIST_VERSION,
+
+    seed: tournamentSeed,
+
+    position: currentIndex,
+
     deferred,
-    wins,
-    losses,
+
     results,
   };
+}
+
+function saveProgress() {
+  const data = getSaveData();
 
   localStorage.setItem("pokemon-favorite-tournament", JSON.stringify(data));
+}
+
+function saveGameFile() {
+  const data = getSaveData();
+
+  const saveText = JSON.stringify(data, null, 2);
+
+  const blob = new Blob([saveText], {
+    type: "text/plain",
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+
+  link.href = url;
+
+  link.download = "pokemon-favorite-tournament.txt";
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  link.remove();
+
+  URL.revokeObjectURL(url);
+}
+
+async function loadGameFile(file) {
+  try {
+    const text = await file.text();
+
+    const data = JSON.parse(text);
+
+    // Validate the save format.
+    if (
+      !data ||
+      data.version !== 2 ||
+      data.pokemonListVersion !== POKEMON_LIST_VERSION ||
+      typeof data.seed !== "number" ||
+      typeof data.position !== "number" ||
+      !Array.isArray(data.deferred) ||
+      typeof data.results !== "object" ||
+      data.results === null
+    ) {
+      throw new Error("Invalid or incompatible save file.");
+    }
+
+    tournamentSeed = data.seed;
+
+    matchups = createMatchups(tournamentSeed);
+
+    currentIndex = data.position;
+
+    deferred = data.deferred;
+
+    results = data.results;
+
+    rebuildStats();
+
+    saveProgress();
+
+    alert("Game loaded successfully!");
+
+    location.reload();
+  } catch (error) {
+    console.error("Could not load save file:", error);
+
+    alert(
+      "Sorry, that file could not be loaded. " +
+        "Make sure it is a Pokémon Favorites save file."
+    );
+  }
 }
 
 function loadProgress() {
@@ -381,12 +593,37 @@ function loadProgress() {
   try {
     const data = JSON.parse(saved);
 
-    matchups = data.matchups;
-    currentIndex = data.currentIndex;
+    // Old save format.
+    if (
+      !data ||
+      data.version !== 2 ||
+      data.pokemonListVersion !== POKEMON_LIST_VERSION ||
+      typeof data.seed !== "number" ||
+      typeof data.position !== "number" ||
+      !Array.isArray(data.deferred) ||
+      typeof data.results !== "object" ||
+      data.results === null
+    ) {
+      console.warn("Old save format detected. Starting a new tournament.");
+
+      localStorage.removeItem("pokemon-favorite-tournament");
+
+      createTournament();
+
+      return;
+    }
+
+    tournamentSeed = data.seed;
+
+    matchups = createMatchups(tournamentSeed);
+
+    currentIndex = data.position;
+
     deferred = data.deferred;
-    wins = data.wins;
-    losses = data.losses;
+
     results = data.results;
+
+    rebuildStats();
 
     showCurrentMatchup();
   } catch (error) {
@@ -403,23 +640,46 @@ function loadProgress() {
 // =========================================
 
 pokemonA.addEventListener("click", () => {
-  const [a] = matchups[currentIndex];
+  const [idA] = matchups[currentIndex];
 
-  choosePokemon(a);
+  const pokemon = getPokemon(idA);
+
+  if (pokemon) {
+    choosePokemon(pokemon);
+  }
 });
 
 pokemonB.addEventListener("click", () => {
-  const [, b] = matchups[currentIndex];
+  const [, idB] = matchups[currentIndex];
 
-  choosePokemon(b);
+  const pokemon = getPokemon(idB);
+
+  if (pokemon) {
+    choosePokemon(pokemon);
+  }
 });
 
 deferButton.addEventListener("click", deferMatchup);
 
-saveButton.addEventListener("click", () => {
-  saveProgress();
+saveGameButton.addEventListener("click", () => {
+  saveGameFile();
+});
 
-  alert("Progress saved!");
+loadGameButton.addEventListener("click", () => {
+  loadGameInput.click();
+});
+
+loadGameInput.addEventListener("change", async () => {
+  const file = loadGameInput.files[0];
+
+  if (!file) {
+    return;
+  }
+
+  await loadGameFile(file);
+
+  // Allow the same file to be selected again later.
+  loadGameInput.value = "";
 });
 
 resetButton.addEventListener("click", () => {
