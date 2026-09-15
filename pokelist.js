@@ -1,13 +1,8 @@
-// Your Pokémon collection for the favorite tournament.
+// Pokémon collection for the favorite tournament.
 //
-// apiName = the numeric Pokémon ID used by PokéAPI
-//
-// displayName = what the user sees in the tournament
-//
-// IMPORTANT:
 // - "id" is the app's stable internal ID.
-// - "apiName" is the PokéAPI ID.
 // - Do not change the app "id" values when updating API data.
+// - "apiName" is the PokéAPI ID.
 
 const POKEMON = [
   // =========================

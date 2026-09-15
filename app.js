@@ -55,9 +55,10 @@ const deferButton = document.getElementById("defer-button");
 const saveGameButton = document.getElementById("save-game-button");
 
 const loadGameButton = document.getElementById("load-game-button");
-
 const loadGameInput = document.getElementById("load-game-input");
 const resetButton = document.getElementById("reset-button");
+
+const standingsList = document.getElementById("standings-list");
 
 // =========================================
 // Helpers
@@ -107,6 +108,37 @@ function createMatchups(seed) {
 
 function getPokemon(id) {
   return POKEMON.find((pokemon) => pokemon.id === id);
+}
+
+function updateStandings() {
+  const standings = POKEMON.map((pokemon) => ({
+    pokemon,
+    wins: wins[pokemon.id] || 0,
+  }))
+    .filter((entry) => entry.wins > 0)
+    .sort((a, b) => b.wins - a.wins);
+
+  standingsList.innerHTML = "";
+
+  let rank = 0;
+  let previousWins = null;
+
+  standings.slice(0, 10).forEach((entry, index) => {
+    if (entry.wins !== previousWins) {
+      rank = index + 1;
+    }
+
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+        <span class="standing-name">${entry.pokemon.displayName}</span>
+        <span class="standing-wins">${entry.wins}</span>
+      `;
+
+    standingsList.appendChild(li);
+
+    previousWins = entry.wins;
+  });
 }
 
 // =========================================
@@ -312,6 +344,8 @@ function choosePokemon(winner) {
     winner: winner.id,
     loser: loser.id,
   };
+
+  updateStandings();
 
   currentIndex++;
 
@@ -583,6 +617,8 @@ async function loadGameFile(file) {
 
     rebuildStats();
 
+    updateStandings();
+
     saveProgress();
 
     alert("Game loaded successfully!");
@@ -640,6 +676,8 @@ function loadProgress() {
     results = data.results;
 
     rebuildStats();
+
+    updateStandings();
 
     showCurrentMatchup();
   } catch (error) {
