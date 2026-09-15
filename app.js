@@ -77,7 +77,15 @@ function createMatchups() {
 // Artwork
 // =========================================
 
+const artworkCache = new Map();
+
 async function getPokemonArtwork(pokemon) {
+  // Return cached artwork if we've already
+  // looked this Pokémon up.
+  if (artworkCache.has(pokemon.apiName)) {
+    return artworkCache.get(pokemon.apiName);
+  }
+
   try {
     const response = await fetch(API_URL + pokemon.apiName);
 
@@ -87,7 +95,12 @@ async function getPokemonArtwork(pokemon) {
 
     const data = await response.json();
 
-    return data.sprites.other["official-artwork"].front_default;
+    const artwork = data.sprites.other["official-artwork"].front_default;
+
+    // Cache the result so we don't request it again.
+    artworkCache.set(pokemon.apiName, artwork);
+
+    return artwork;
   } catch (error) {
     console.error("Could not load artwork:", pokemon.displayName, error);
 
@@ -100,12 +113,19 @@ async function displayPokemon(pokemon, imageElement, nameElement) {
 
   imageElement.alt = pokemon.displayName;
   imageElement.src = "";
+  imageElement.classList.remove("loaded");
 
   const artwork = await getPokemonArtwork(pokemon);
 
-  if (artwork) {
-    imageElement.src = artwork;
+  if (!artwork) {
+    return;
   }
+
+  imageElement.onload = () => {
+    imageElement.classList.add("loaded");
+  };
+
+  imageElement.src = artwork;
 }
 
 // =========================================

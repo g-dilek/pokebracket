@@ -56,20 +56,39 @@ button {
 
   margin: 0 auto 16px;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
 
+  border: 3px solid #202124;
+  border-radius: 50%;
+
+  background: linear-gradient(
+    to bottom,
+    #ef4444 0%,
+    #ef4444 47%,
+    #202124 47%,
+    #202124 53%,
+    #ffffff 53%,
+    #ffffff 100%
+  );
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.pokeball-center {
+  position: absolute;
+
+  width: 16px;
+  height: 16px;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  border: 3px solid #202124;
   border-radius: 50%;
 
   background: #ffffff;
-
-  border: 2px solid #202124;
-
-  font-size: 30px;
-  line-height: 1;
-
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 h1 {
@@ -412,9 +431,14 @@ h1 {
     width: 40px;
     height: 40px;
 
-    font-size: 24px;
-
     margin-bottom: 12px;
+  }
+
+  .pokeball-center {
+    width: 14px;
+    height: 14px;
+
+    border-width: 2px;
   }
 
   .subtitle {
