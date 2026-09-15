@@ -35,60 +35,19 @@ button {
 
   min-height: 100vh;
 
-  padding: 48px 32px 32px;
+  padding: 36px 32px 28px;
 
   display: flex;
   flex-direction: column;
 }
 
 /* =========================
-   HEADER
-   ========================= */
+     HEADER
+     ========================= */
 
 .header {
   text-align: center;
-  margin-bottom: 36px;
-}
-
-.pokeball-icon {
-  width: 48px;
-  height: 48px;
-
-  margin: 0 auto 16px;
-
-  position: relative;
-
-  border: 3px solid #202124;
-  border-radius: 50%;
-
-  background: linear-gradient(
-    to bottom,
-    #ef4444 0%,
-    #ef4444 47%,
-    #202124 47%,
-    #202124 53%,
-    #ffffff 53%,
-    #ffffff 100%
-  );
-
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.pokeball-center {
-  position: absolute;
-
-  width: 16px;
-  height: 16px;
-
-  top: 50%;
-  left: 50%;
-
-  transform: translate(-50%, -50%);
-
-  border: 3px solid #202124;
-  border-radius: 50%;
-
-  background: #ffffff;
+  margin-bottom: 24px;
 }
 
 h1 {
@@ -100,27 +59,43 @@ h1 {
 }
 
 .subtitle {
-  margin: 10px 0 28px;
+  max-width: 650px;
+
+  margin: 10px auto 22px;
 
   color: #6b7280;
 
-  font-size: 1.05rem;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 /* =========================
-   PROGRESS
-   ========================= */
+     PROGRESS
+     ========================= */
 
 .progress-container {
   width: 100%;
-  max-width: 650px;
+  max-width: 800px;
 
   margin: 0 auto;
 }
 
-.progress-bar {
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 8px;
+
+  color: #737780;
+
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+.progress-bar-container {
   width: 100%;
-  height: 8px;
+  height: 10px;
 
   overflow: hidden;
 
@@ -129,7 +104,7 @@ h1 {
   background: #e2e5eb;
 }
 
-.progress-fill {
+.progress-bar {
   width: 0%;
   height: 100%;
 
@@ -140,20 +115,9 @@ h1 {
   transition: width 0.3s ease;
 }
 
-.progress-text {
-  display: flex;
-  justify-content: space-between;
-
-  margin-top: 8px;
-
-  color: #737780;
-
-  font-size: 0.85rem;
-}
-
 /* =========================
-   MATCHUP
-   ========================= */
+     MATCHUP
+     ========================= */
 
 .matchup {
   flex: 1;
@@ -176,8 +140,8 @@ h1 {
 }
 
 /* =========================
-   POKÉMON CARDS
-   ========================= */
+     POKÉMON CARDS
+     ========================= */
 
 .pokemon-card {
   width: 100%;
@@ -274,8 +238,8 @@ h1 {
 }
 
 /* =========================
-   VS
-   ========================= */
+     VS
+     ========================= */
 
 .vs {
   width: 64px;
@@ -299,22 +263,24 @@ h1 {
 }
 
 /* =========================
-   ACTIONS
-   ========================= */
+     ACTIONS
+     ========================= */
 
 .actions {
   display: flex;
   justify-content: center;
 
-  margin-top: 28px;
+  margin-top: 22px;
 }
 
 .secondary-button {
+  min-width: 180px;
+
   padding: 12px 20px;
 
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
 
   border: 1px solid #d9dce3;
   border-radius: 999px;
@@ -325,7 +291,7 @@ h1 {
   cursor: pointer;
 
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 650;
 
   transition: background 0.15s ease, border-color 0.15s ease,
     transform 0.15s ease;
@@ -343,55 +309,59 @@ h1 {
   transform: translateY(0);
 }
 
-/* =========================
-   STATUS
-   ========================= */
-
-.status {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-
-  margin-top: 26px;
-}
-
-.status-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  gap: 3px;
-}
-
-.status-label {
-  color: #8a8f99;
-
-  font-size: 0.75rem;
-  font-weight: 600;
-
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.status-value {
-  font-size: 1.1rem;
-  font-weight: 750;
+.secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 /* =========================
-   FOOTER
-   ========================= */
+     FOOTER / SAVE CONTROLS
+     ========================= */
 
 .footer {
   display: flex;
   justify-content: center;
-  gap: 24px;
+  align-items: center;
 
-  margin-top: 28px;
+  gap: 10px;
+
+  margin-top: 22px;
+}
+
+.utility-button {
+  padding: 10px 18px;
+
+  border: 1px solid #d9dce3;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: #3f444d;
+
+  cursor: pointer;
+
+  font-size: 0.9rem;
+  font-weight: 650;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+
+  transition: background 0.15s ease, border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.utility-button:hover {
+  background: #f9fafb;
+
+  border-color: #bfc3cc;
+
+  transform: translateY(-1px);
+}
+
+.utility-button:active {
+  transform: translateY(0);
 }
 
 .text-button {
-  padding: 6px 8px;
+  padding: 8px 10px;
 
   border: 0;
 
@@ -402,6 +372,7 @@ h1 {
   cursor: pointer;
 
   font-size: 0.85rem;
+  font-weight: 600;
 
   transition: color 0.15s ease;
 }
@@ -415,44 +386,34 @@ h1 {
 }
 
 /* =========================
-   RESPONSIVE
-   ========================= */
+     RESPONSIVE
+     ========================= */
 
 @media (max-width: 700px) {
   .app {
-    padding: 28px 16px 24px;
+    padding: 24px 16px 20px;
   }
 
   .header {
-    margin-bottom: 20px;
-  }
-
-  .pokeball-icon {
-    width: 40px;
-    height: 40px;
-
-    margin-bottom: 12px;
-  }
-
-  .pokeball-center {
-    width: 14px;
-    height: 14px;
-
-    border-width: 2px;
+    margin-bottom: 18px;
   }
 
   .subtitle {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
+  }
+
+  .progress-label {
+    font-size: 0.78rem;
   }
 
   .matchup {
     grid-template-columns: 1fr;
 
-    gap: 12px;
+    gap: 10px;
   }
 
   .pokemon-card {
-    min-height: 240px;
+    min-height: 230px;
 
     padding: 18px;
 
@@ -460,7 +421,7 @@ h1 {
   }
 
   .pokemon-image-container {
-    height: 175px;
+    height: 165px;
   }
 
   .pokemon-name {
@@ -477,21 +438,19 @@ h1 {
   }
 
   .actions {
-    margin-top: 20px;
-  }
-
-  .status {
-    margin-top: 20px;
+    margin-top: 16px;
   }
 
   .footer {
-    margin-top: 20px;
+    margin-top: 16px;
+
+    flex-wrap: wrap;
   }
 }
 
 /* =========================
-   LOADING / DISABLED STATES
-   ========================= */
+     LOADING / DISABLED STATES
+     ========================= */
 
 .pokemon-card.loading-card {
   cursor: wait;
@@ -503,8 +462,8 @@ h1 {
 }
 
 /* =========================
-   CHOICE ANIMATION
-   ========================= */
+     CHOICE ANIMATION
+     ========================= */
 
 .pokemon-card.chosen {
   border-color: #4f46e5;
@@ -521,8 +480,8 @@ h1 {
 }
 
 /* =========================
-   ERROR STATE
-   ========================= */
+     ERROR STATE
+     ========================= */
 
 .error {
   color: #b42318;

@@ -46,12 +46,9 @@ const nameA = document.getElementById("name-a");
 const nameB = document.getElementById("name-b");
 
 const matchupNumber = document.getElementById("matchup-number");
-const progressText = document.getElementById("progress-text");
 const progressBar = document.getElementById("progress-bar");
 
 const remainingCount = document.getElementById("remaining-count");
-const deferredCount = document.getElementById("deferred-count");
-const deferredPill = document.getElementById("deferred-pill");
 
 const deferButton = document.getElementById("defer-button");
 const saveGameButton = document.getElementById("save-game-button");
@@ -201,7 +198,7 @@ function createTournament() {
     losses[pokemon.id] = 0;
   }
 
-  deferButton.textContent = "Too close to call";
+  deferButton.textContent = "Skip";
   deferButton.disabled = false;
 
   showCurrentMatchup();
@@ -244,7 +241,7 @@ async function showCurrentMatchup() {
 
   updateProgress();
 
-  deferButton.textContent = "Too close to call";
+  deferButton.textContent = "Skip";
   deferButton.disabled = false;
 
   await Promise.all([
@@ -399,20 +396,11 @@ async function resolveDeferred() {
 
 function updateProgress() {
   const completed = Object.keys(results).length;
-
   const total = matchups.length;
-
   const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
 
-  progressText.textContent = `${percentage}% complete`;
-
   progressBar.style.width = `${percentage}%`;
-
-  remainingCount.textContent = total - completed;
-
-  deferredCount.textContent = deferred.length;
-
-  deferredPill.textContent = deferred.length;
+  remainingCount.textContent = `${total - completed} remaining`;
 }
 
 // =========================================

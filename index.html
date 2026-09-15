@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Pokémon Favorites</title>
+    <title>Favorite Pokemon</title>
 
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -16,24 +16,21 @@
            ========================================= -->
 
       <header class="header">
-        <div class="pokeball-icon" aria-hidden="true">
-          <div class="pokeball-center"></div>
-        </div>
-
-        <h1>The Pokemon Round Robin Bracket</h1>
+        <h1>Who's Your Favorite Pokemon?</h1>
 
         <p class="subtitle">
-          For each matchup, pick your favorite Pokémon. If you're not sure,
-          click 'skip'.
+          Pick your favorite Pokemon in each matchup. If you can't decide, click
+          'skip'.
         </p>
 
         <div class="progress-container">
-          <div class="progress-bar-container">
-            <div id="progress-bar" class="progress-bar"></div>
+          <div class="progress-label">
+            <span id="matchup-number">Matchup 1 of 66,795</span>
+            <span id="remaining-count">66,795 remaining</span>
           </div>
 
-          <div class="progress-text">
-            <span id="progress-text">0% complete</span>
+          <div class="progress-bar-container">
+            <div id="progress-bar" class="progress-bar"></div>
           </div>
         </div>
       </header>
@@ -62,7 +59,7 @@
 
         <!-- VS -->
 
-        <div class="vs">
+        <div class="vs" aria-hidden="true">
           <span>VS</span>
         </div>
 
@@ -85,14 +82,6 @@
       </section>
 
       <!-- =========================================
-           Matchup information
-           ========================================= -->
-
-      <div class="matchup-info">
-        <span id="matchup-number">Matchup</span>
-      </div>
-
-      <!-- =========================================
            Actions
            ========================================= -->
 
@@ -103,44 +92,20 @@
       </section>
 
       <!-- =========================================
-           Status
-           ========================================= -->
-
-      <section class="status">
-        <div class="status-item">
-          <span class="status-label">Remaining</span>
-
-          <span id="remaining-count" class="status-value"> 0 </span>
-        </div>
-
-        <div class="status-item">
-          <span class="status-label">Deferred</span>
-
-          <span id="deferred-count" class="status-value"> 0 </span>
-        </div>
-
-        <div class="status-item">
-          <span class="status-label">Deferred total</span>
-
-          <span id="deferred-pill" class="status-value"> 0 </span>
-        </div>
-      </section>
-
-      <!-- =========================================
-           Footer
+           Save / Load
            ========================================= -->
 
       <footer class="footer">
-        <button id="save-game-button" class="text-button" type="button">
+        <button id="save-game-button" class="utility-button" type="button">
           Save Game
         </button>
 
-        <button id="load-game-button" class="text-button" type="button">
+        <button id="load-game-button" class="utility-button" type="button">
           Load Game
         </button>
 
         <button id="reset-button" class="text-button danger" type="button">
-          Reset Tournament
+          Reset
         </button>
 
         <input id="load-game-input" type="file" accept=".txt,.json" hidden />
