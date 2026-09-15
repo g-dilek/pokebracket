@@ -167,34 +167,37 @@ async function displayPokemon(pokemon, imageElement, nameElement) {
   nameElement.textContent = pokemon.displayName;
 
   imageElement.alt = pokemon.displayName;
-  imageElement.src = "";
   imageElement.classList.remove("loaded");
 
   const container = imageElement.closest(".pokemon-image-container");
   const loadingElement = container.querySelector(".loading");
 
-  loadingElement.style.display = "block";
   loadingElement.textContent = "Loading...";
+  loadingElement.style.display = "block";
+
+  // Hide the image while the new one loads.
+  imageElement.style.visibility = "hidden";
 
   const artwork = await getPokemonArtwork(pokemon);
 
-  console.log("FINAL ARTWORK FOR", pokemon.displayName, ":", artwork);
-
   if (!artwork) {
-    console.error("No artwork URL returned for", pokemon.displayName);
-    loadingElement.textContent = "API error";
+    loadingElement.textContent = "Image unavailable";
+    imageElement.style.visibility = "hidden";
     return;
   }
 
+  // Wait for the actual image file to load.
   imageElement.onload = () => {
-    console.log("IMAGE LOADED:", pokemon.displayName);
     imageElement.classList.add("loaded");
+    imageElement.style.visibility = "visible";
     loadingElement.style.display = "none";
   };
 
-  imageElement.onerror = (error) => {
-    console.error("IMAGE FAILED TO LOAD:", pokemon.displayName, artwork, error);
-    loadingElement.textContent = "Image failed";
+  imageElement.onerror = () => {
+    imageElement.classList.remove("loaded");
+    imageElement.style.visibility = "hidden";
+    loadingElement.textContent = "Image unavailable";
+    loadingElement.style.display = "block";
   };
 
   imageElement.src = artwork;
